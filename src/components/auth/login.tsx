@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 const Login = () => {
   // Define el Hook useForm dentro del componente funcional
@@ -29,9 +30,16 @@ const Login = () => {
   }
 
   return (
-    <div className='bg-white'>
-      <h2>Login Form</h2>
-      <Form {...form}>
+    <div className='p-5 w-full max-w-md mx-auto'>
+      <Card className='bg-white'> 
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
+          <CardDescription>
+            Bienvenido, ! Por Favor Registra tu cuenta.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
@@ -63,6 +71,8 @@ const Login = () => {
           <Button type="submit">Login</Button>
         </form>
       </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
