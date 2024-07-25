@@ -26,3 +26,7 @@ object({
 .refine((data) => data.Contraseña === data.confirmPassword, {
     message: "Contraseña debe coincidir"
 })
+
+export const searchFormSchema  = z.object({
+    email: z.string().email("Debe ingresar un correo valido")
+})
