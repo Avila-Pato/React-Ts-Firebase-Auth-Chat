@@ -1,7 +1,17 @@
+import { Button } from "../ui/button"
+
 
 const Profile = () => {
     return (
-        <div>Perfil</div>
+        <div className="p-4 text-center border-l">
+            <img src="https://randomuser.me/api/portraits/men/95.jpg"
+                alt=""
+                className="rounded-md mb-4 mx-auto w-24 h-24" />
+            <h2 className="text-xl font-bold text-gray-700 mb-4">Perfil</h2>
+            <p className="font-semibold mb-2">Rafael</p>
+            <p className="text-gray-500 mb-2">Useranonimo@gmail.com</p>
+            <Button className="w-full">Desconectarse</Button>
+        </div>
     )
 }
 

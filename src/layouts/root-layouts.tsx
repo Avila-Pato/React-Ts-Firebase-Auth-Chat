@@ -5,6 +5,10 @@ import AuthLayout from "./auth-layout";
 
 const RootLayouts = () => {
 
+
+
+
+
   const user = true;
 
   return (

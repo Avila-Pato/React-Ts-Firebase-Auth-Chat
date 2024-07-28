@@ -1,4 +1,7 @@
 module.exports = {
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error"
+  },
   root: true,
   env: { browser: true, es2020: true },
   extends: [
