@@ -1,5 +1,5 @@
 import MessagesFooter from "./message.footer"
-import MessagesChat from "./messages-chat"
+import MessagesChat from "./message-chat"
 import MessagesHeader from "./messages-header"
 
 
