@@ -1,6 +1,5 @@
 ## Panel de Administración MERN Stack + FireChat
 
-**Este proyecto** incluye dos partes principales: un panel de administración utilizando la pila MERN y una aplicación de chat en tiempo real, construida con React y TypeScript.
 
 ### Tecnologías y Recursos:
 
