@@ -1,7 +1,21 @@
+import { useAuth } from "reactfire"
 import { Button } from "../ui/button"
 
 
 const Profile = () => {
+    // desconectar usuario
+    const auth = useAuth();
+
+    const handleClickOut = async () => {
+        try {
+            await auth.signOut();
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+        }
+    }
+
+
+
     return (
         <div className="p-4 text-center border-l">
             <img src="https://randomuser.me/api/portraits/men/95.jpg"
@@ -10,7 +24,7 @@ const Profile = () => {
             <h2 className="text-xl font-bold text-gray-700 mb-4">Perfil</h2>
             <p className="font-semibold mb-2">Rafael</p>
             <p className="text-gray-500 mb-2">Useranonimo@gmail.com</p>
-            <Button className="w-full">Desconectarse</Button>
+            <Button onClick={handleClickOut} className="w-full">Desconectarse</Button>
         </div>
     )
 }
