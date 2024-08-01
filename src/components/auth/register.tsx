@@ -15,16 +15,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
-import { AuthError, createUserWithEmailAndPassword } from 'firebase/auth';
+import { AuthError, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
-import { useAuth } from 'reactfire';
-// import { useState } from 'react';
+import { useAuth, useStorage } from 'reactfire';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { useLoadingStore } from '@/store/loading.store';
 
 const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
 
 
   // llamando al useAuth para registrar a usuarios 
   const auth = useAuth();
+  const storage = useStorage();
+  const { loading, setLoading } = useLoadingStore()
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -42,11 +45,33 @@ const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
     console.log(values);
     // Lógica para registrar al usuario en firebase
     try {
-      const response = await createUserWithEmailAndPassword(auth, values.Correo, values.Contraseña);
+      setLoading(true);
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        values.Correo,
+        values.Contraseña);
       console.log("Usuario registrado exitosamente");
-      console.log(response);
+
+      // 1 GUARDAR AVATAR EN STORAGE
+
+      const storageRef = ref(storage, "avatar" + user.uid + ".jpg");
+      await uploadBytes(storageRef, values.photoURL);
+
+      // 2 RECUPERAR LA URL DEL AVATAR
+
+      const photoURL = await getDownloadURL(storageRef);
+
+      // 3- Actualizar el perfil del usuario
+      await updateProfile(user, {
+        displayName: values.displayName,
+        photoURL: photoURL,
+      });
+
+
     } catch (error) {
       console.error("Error al registrar:", error);
+
+
 
       // Manejar el error de registro
 
@@ -65,7 +90,10 @@ const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
       // if you want put other errors
 
 
+      // se utiliza finalli porque en caso de errores el boton queda desabilitado
+    } finally {
 
+      setLoading(false)
     }
 
 
@@ -155,7 +183,11 @@ const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
               )}
             />
 
-            <Button type="submit" className="w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2">Registrate</Button>
+            <Button type="submit"
+              className="w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2"
+              disabled={loading}
+
+            >Registrate</Button>
           </form>
         </Form>
 

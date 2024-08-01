@@ -9,7 +9,7 @@ const MessagesHeader = () => {
                 alt=""
                 className="rounded-md size-20"
             />
-            <div className="bg-pink-300">
+            <div className="">
                 <p className="text-lg font-semibold text-gray-700">Lorem ipsum dolor sit amet.</p>
                 <p className="text-xs text-gray-500">Activo</p>
 

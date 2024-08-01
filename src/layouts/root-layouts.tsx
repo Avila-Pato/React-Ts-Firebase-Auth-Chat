@@ -1,16 +1,20 @@
 
 import ChatLayout from "./chat-layout";
 import AuthLayout from "./auth-layout";
-import { useUser } from "reactfire";
+import { useSigninCheck } from "reactfire";
+import { useLoadingStore } from "@/store/loading.store";
 
 
 const RootLayouts = () => {
 
+
+  const { status, data: signInCheckResult } = useSigninCheck();
+  const { loading } = useLoadingStore()
+
+
+
+
   // Construyendo el laoding y verificando el usuario
-  const { status, data: user } = useUser();
-
-
-
   if (status === 'loading') {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -23,7 +27,7 @@ const RootLayouts = () => {
   return (
     <div className="min-h-screen bg-gray-100 ">
       {
-        user ? (
+        signInCheckResult.signedIn && !loading ? (
           <ChatLayout />
         )
           : (

@@ -13,8 +13,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { useAuth } from 'reactfire';
+import { AuthError, signInWithEmailAndPassword } from "firebase/auth";
+import { useLoadingStore } from '@/store/loading.store';
 
 const Login = ({ onLoginRequest }: { onLoginRequest: () => void }) => {
+
+  const auth = useAuth();
+  const { loading, setLoading } = useLoadingStore()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -26,6 +33,34 @@ const Login = ({ onLoginRequest }: { onLoginRequest: () => void }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     // Manejar el inicio de sesión aquí
+
+    try {
+      setLoading(true);
+      await signInWithEmailAndPassword(auth,
+        values.Correo,
+        values.Contraseña);
+
+    } catch (error) {
+      console.log(error);
+      const firebaserError = error as AuthError;
+
+      // agregando logica al Manejar el error de inicio de sesión y password.
+
+      if (firebaserError.code === 'auth/invalid-login-credentials') {
+        form.setError("Correo", {
+          type: "manual",
+          message: "Correo incorrecto.",
+        })
+        form.setError("Contraseña", {
+          type: "manual",
+          message: "Contraseña incorrecta.",
+        })
+      }
+
+    } finally {
+      setLoading(false);
+    }
+
   }
 
   return (
@@ -67,7 +102,9 @@ const Login = ({ onLoginRequest }: { onLoginRequest: () => void }) => {
               )}
             />
 
-            <Button type="submit" className="w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2">Login</Button>
+            <Button type="submit" className="w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2"
+              disabled={loading}
+            >Login</Button>
           </form>
         </Form>
 
