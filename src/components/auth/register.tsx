@@ -22,7 +22,7 @@ import { AuthError, createUserWithEmailAndPassword, updateProfile } from 'fireba
 import { useAuth, useFirestore, useStorage } from 'reactfire';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { useLoadingStore } from '@/store/loading.store';
-import { UserDB, users } from '@/schemas/firetore-schema';
+import { UserDB } from '@/schemas/firetore-schema';
 import { doc, setDoc } from 'firebase/firestore';
 
 const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
