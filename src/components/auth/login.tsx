@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { useAuth } from 'reactfire';
 import { AuthError, signInWithEmailAndPassword } from "firebase/auth";
 import { useLoadingStore } from '@/store/loading.store';
+import { Spinner } from '../ui/spiner';
 
 const Login = ({ onLoginRequest }: { onLoginRequest: () => void }) => {
 
@@ -102,9 +103,21 @@ const Login = ({ onLoginRequest }: { onLoginRequest: () => void }) => {
               )}
             />
 
-            <Button type="submit" className="w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2"
+            <Button
+              type="submit"
+              className={`w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2 flex justify-center items-center ${loading ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               disabled={loading}
-            >Login</Button>
+            >
+              {loading ? (
+                <>
+                  <Spinner className="mr-2" /> {/* Añade un pequeño margen entre el spinner y el texto */}
+                  Cargando...
+                </>
+              ) : (
+                "Iniciar Sesión"
+              )}
+            </Button>
           </form>
         </Form>
 

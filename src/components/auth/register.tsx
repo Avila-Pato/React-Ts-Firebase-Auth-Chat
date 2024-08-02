@@ -4,6 +4,8 @@ import { registracion as formSchema } from '@/lib/zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spiner"; // Asegúrate de tener un componente de Spinner
+
 import {
   Form,
   FormControl,
@@ -17,15 +19,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 
 import { AuthError, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
-import { useAuth, useStorage } from 'reactfire';
+import { useAuth, useFirestore, useStorage } from 'reactfire';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { useLoadingStore } from '@/store/loading.store';
+import { UserDB, users } from '@/schemas/firetore-schema';
+import { doc, setDoc } from 'firebase/firestore';
 
 const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
 
 
   // llamando al useAuth para registrar a usuarios 
   const auth = useAuth();
+  const db = useFirestore();
   const storage = useStorage();
   const { loading, setLoading } = useLoadingStore()
 
@@ -42,8 +47,8 @@ const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Lógica para registrar al usuario en firebase
+    // console.log(values);
+    // Lógica para registrar al usuario.
     try {
       setLoading(true);
       const { user } = await createUserWithEmailAndPassword(
@@ -66,6 +71,22 @@ const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
         displayName: values.displayName,
         photoURL: photoURL,
       });
+
+      // 4- Guardar la collecion de usuarios segun el mensaje la base de datos simulada
+
+      const userDB: UserDB = {
+        displayName: values.displayName,
+        email: values.Correo,
+        photoURL,
+        uid: user.uid,
+        friends: [],
+        rooms: [],
+      };
+      // 4.1- Guarda la colección de usuarios en Firestore 
+      const userDBRef = doc(db, `users/${user.uid}`);
+      await setDoc(userDBRef, userDB);
+      console.log("UserDB guardado en Firestore:", userDB);
+
 
 
     } catch (error) {
@@ -183,11 +204,21 @@ const Register = ({ onRegisterSuccess }: { onRegisterSuccess: () => void }) => {
               )}
             />
 
-            <Button type="submit"
-              className="w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2"
+            <Button
+              type="submit"
+              className={`w-full bg-blue-500 text-white hover:bg-blue-600 rounded-md py-2 flex justify-center items-center ${loading ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               disabled={loading}
-
-            >Registrate</Button>
+            >
+              {loading ? (
+                <>
+                  <Spinner className="mr-2" /> {/* Añade un pequeño margen entre el spinner y el texto */}
+                  Cargando...
+                </>
+              ) : (
+                "Registrarse"
+              )}
+            </Button>
           </form>
         </Form>
 
