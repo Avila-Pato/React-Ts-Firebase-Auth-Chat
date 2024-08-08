@@ -3,9 +3,10 @@ import { cn } from "@/lib/utils";
 interface MessageProps {
     message: string;
     time: string;
-    photoURL: string;
+    photoURL: string | null;
     isCurrentUser: boolean;
-}
+    
+  }
 
 const Message = ({
     message,
@@ -22,7 +23,7 @@ const Message = ({
 
         }>
             <img
-                src={photoURL}
+                src={photoURL || "/default-avatar.png"}
                 alt=""
                 className="rounded-full size-10"
             />

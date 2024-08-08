@@ -17,11 +17,13 @@ import { useAuth } from 'reactfire';
 import { AuthError, signInWithEmailAndPassword } from "firebase/auth";
 import { useLoadingStore } from '@/store/loading.store';
 import { Spinner } from '../ui/spiner';
+import { useChatStore } from '@/store/chat-store';
 
 const Login = ({ onLoginRequest }: { onLoginRequest: () => void }) => {
 
   const auth = useAuth();
   const { loading, setLoading } = useLoadingStore()
+  const { resetFriend } = useChatStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,6 +42,7 @@ const Login = ({ onLoginRequest }: { onLoginRequest: () => void }) => {
       await signInWithEmailAndPassword(auth,
         values.Correo,
         values.Contraseña);
+        resetFriend();
 
     } catch (error) {
       console.log(error);

@@ -1,5 +1,6 @@
 import { useAuth, useUser } from "reactfire"
 import { Button } from "../ui/button"
+import { useChatStore } from "@/store/chat-store";
 // import { useEffect, useState } from "react"
 // import { User } from "firebase/auth";
 
@@ -8,11 +9,12 @@ const Profile = () => {
     // desconectar usuario
     const auth = useAuth();
     const { data: user } = useUser();
-    // const [user, setUser] = useState<User | null>(null);
+    const {resetFriend} = useChatStore();
 
 
     // metodo para cerrar sesion
     const handleClickOut = async () => {
+        resetFriend();
         try {
             await auth.signOut();
         } catch (error) {

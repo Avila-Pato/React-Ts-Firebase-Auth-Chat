@@ -1,68 +1,120 @@
-import { Button } from "../ui/button"
-import { BsEmojiLaughingFill } from "react-icons/bs";
-import { Input } from "../ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { UserDB } from "@/schemas/firetore-schema";
+import { Friend } from "@/store/chat-store";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+import {
+  arrayUnion,
+  doc,
+  Firestore,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useState } from "react";
-import EmojiPicker, { EmojiClickData } from 'emoji-picker-react'
+import { BsEmojiSmileFill } from "react-icons/bs";
+import { useAuth, useFirestore } from "reactfire";
 
-/**
- * Renders the footer component for a chat message input.
- * 
- * The footer includes an emoji picker button, an input field for the message text, and a send button.
- * 
- * The component manages the state of the message text and the visibility of the emoji picker.
- * When the user clicks an emoji, it is added to the message text.
- * When the user clicks the send button, the message is logged to the console (simulating sending to a server).
- * The message input and emoji picker are then cleared.
- */
-const MessagesFooter = () => {
-    const [message, setMessage] = useState("")
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+const updateLastMessage = async (
+  db: Firestore,
+  uid: string,
+  roomId: string,
+  message: string
+) => {
+  // actualizar el ultimo mensaje en la base de datos
+  const userRef = doc(db, "users", uid);
+  const { rooms } = (await getDoc(userRef)).data() as UserDB;
 
-    // manejando onEmoji Click para previamente mostrarlo en el chat
-    const onEmojiClick = (emojiData: EmojiClickData) => {
-        setMessage((prev) => prev + emojiData.emoji)
+  const roomUpdateLastMessage = rooms.map((room) => {
+    if (room.roomId === roomId) {
+      return {
+        ...room,
+        lastMessage: message,
+        timestamp: new Date().toISOString(),
+      };
     }
+    return room;
+  });
+  await updateDoc(userRef, {
+    rooms: roomUpdateLastMessage,
+  });
+};
 
-
-    const handleSendMessage = () => {
-        if (!message) {
-            return
-        }
-        // enviar el mensaje al servidor (texting) para luego enviarlo a la abse de  datos en firebase
-        console.log(message)
-        // cerrar el mensaje para limpiar el input
-        setMessage("")
-        // cerrar el emoji picker para limpiar el input al enviar emojis
-        setShowEmojiPicker(false)
-
-    }
-
-
-
-
-
-    return (
-        <footer className="border-t p-4 flex gap-x-4">
-            {/* // Emoji Picker entra a estado true cuando se presiona el botón de emoji */}
-            <Button onClick={() => setShowEmojiPicker(prev => !prev)}>
-                <BsEmojiLaughingFill className="text-xl" />
-            </Button>
-            <div className="absolute bottom-12">
-                <EmojiPicker
-                    open={showEmojiPicker}
-                    onEmojiClick={onEmojiClick}
-                />
-            </div>
-
-            <Input
-                placeholder="Escriba su mensaje"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-            />
-            <Button onClick={handleSendMessage}>Enviar</Button>
-
-        </footer>
-    )
+interface MessagesFooterProps {
+  friend: Friend;
 }
 
-export default MessagesFooter
+const MessagesFooter = ({ friend }: MessagesFooterProps) => {
+  const [message, setMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const db = useFirestore();
+  const auth = useAuth();
+
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    setMessage((prev) => prev + emojiData.emoji);
+  };
+
+  const handleSendMessage = async () => {
+    if (!message) return;
+
+    // Clear the input immediately
+    const currentMessage = message;
+    setMessage("");
+
+    try {
+      const roomRef = doc(db, "rooms", friend.roomId);
+      await updateDoc(roomRef, {
+        messages: arrayUnion({
+          message: currentMessage,
+          timestamp: new Date().toISOString(),
+          uid: auth.currentUser!.uid,
+        }),
+      });
+
+      const currentRoomId = friend.roomId;
+      // Actualizar lastMessage
+      await updateLastMessage(
+        db,
+        auth.currentUser!.uid,
+        currentRoomId,
+        currentMessage
+      );
+
+      await updateLastMessage(db, friend.uid, currentRoomId, currentMessage);
+
+      setShowEmojiPicker(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // prevenir el comportamiento predeterminado del Enter
+      handleSendMessage();
+    }
+  };
+
+  return (
+    <footer className="border-t p-4 flex gap-x-2">
+      <div className="relative">
+        <Button onClick={() => setShowEmojiPicker((prev) => !prev)}>
+          <BsEmojiSmileFill className="text-lg" />
+        </Button>
+        {showEmojiPicker && (
+          <div className="absolute bottom-12">
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </div>
+        )}
+      </div>
+      <Input
+        placeholder="Type a message"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyPress={handleKeyPress}
+      />
+      <Button onClick={handleSendMessage}>Send</Button>
+    </footer>
+  );
+};
+
+export default MessagesFooter;
