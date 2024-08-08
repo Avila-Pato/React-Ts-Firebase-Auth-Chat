@@ -1,4 +1,4 @@
-## Panel de Administración MERN Stack + FireChat
+## FireChat
 
 ### Tecnologías y Recursos:
 
