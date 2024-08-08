@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { UserDB } from "@/schemas/firetore-schema";
 import { Friend } from "@/store/chat-store";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+
 import {
   arrayUnion,
   doc,
@@ -13,6 +14,9 @@ import {
 import { useState } from "react";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { useAuth, useFirestore } from "reactfire";
+
+
+
 
 const updateLastMessage = async (
   db: Firestore,
@@ -70,6 +74,12 @@ const MessagesFooter = ({ friend }: MessagesFooterProps) => {
         }),
       });
 
+      
+      console.log('Current Message:', currentMessage);
+console.log('Room ID:', friend.roomId);
+console.log('User UID:', auth.currentUser?.uid);
+
+
       const currentRoomId = friend.roomId;
       // Actualizar lastMessage
       await updateLastMessage(
@@ -78,9 +88,12 @@ const MessagesFooter = ({ friend }: MessagesFooterProps) => {
         currentRoomId,
         currentMessage
       );
+      
 
-      await updateLastMessage(db, friend.uid, currentRoomId, currentMessage);
+   await  updateLastMessage(db, friend.uid, currentRoomId, currentMessage);
 
+
+      
       setShowEmojiPicker(false);
     } catch (error) {
       console.log(error);
