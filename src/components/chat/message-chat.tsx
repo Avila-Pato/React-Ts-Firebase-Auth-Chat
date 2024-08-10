@@ -16,6 +16,8 @@ const MessagesChat = ({ friend }: MessagesChatProps) => {
   const db = useFirestore();
   const { currentUser } = useAuth();
 
+  
+
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;

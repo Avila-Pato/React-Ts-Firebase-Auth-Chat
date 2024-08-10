@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { UserRoom } from "@/schemas/firetore-schema";
 import { useAuth, useFirestore } from "reactfire";
 
+
 interface Friend {
     uid: string;
     displayName: string;
@@ -20,6 +21,8 @@ const Friends = () => {
     const db = useFirestore();
     // Referencia al objeto de autenticación de Firebase
     const auth = useAuth();
+
+    
 
     useEffect(() => {
         // Función para obtener amigos desde una API externa
@@ -84,7 +87,7 @@ const Friends = () => {
     return (
         <div className="grid grid-rows-[auto_1fr] h-screen border-r">
             <section className="border-b p-4">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Chats</h2>
+                <h2 className="text-xl font-bold ml-1 text-gray-700 mb-2">Chats</h2>
                 <FriendSearch />
             </section>
             <section className="custom-scrollbar">

@@ -125,7 +125,7 @@ console.log('User UID:', auth.currentUser?.uid);
         onChange={(e) => setMessage(e.target.value)}
         onKeyPress={handleKeyPress}
       />
-      <Button onClick={handleSendMessage}>Send</Button>
+      <Button onClick={handleSendMessage}>Enviar</Button>
     </footer>
   );
 };

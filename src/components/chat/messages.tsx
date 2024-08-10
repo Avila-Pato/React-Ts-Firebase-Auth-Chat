@@ -11,7 +11,7 @@ const Messages = () => {
   if (!friend)
     return (
       <div className="grid h-screen place-items-center">
-        <p className="text-gray-500">Selecciona un chat </p>
+        <p className="text-gray-900 text-lg italic">Selecciona un chat </p>
       </div>
     );
 
